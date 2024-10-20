@@ -1,51 +1,64 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, Bot, X, Maximize2, Minimize2 } from 'lucide-react';
+import { Send, User, Bot, X, Maximize2, Minimize2, Volume2, VolumeX } from 'lucide-react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import './Chatbot.css';
-import chatbotData from '../chatbotData.json';
+
+// Initialize the Gemini API using the environment variable
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
 const Chatbot = ({ onClose }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const messagesEndRef = useRef(null);
   const greetingShownRef = useRef(false);
 
-useEffect(() => {
-  if (!greetingShownRef.current) {
-    addMessage('bot', chatbotData.chatbotData.greeting);
-    greetingShownRef.current = true;
-  }
-}, []);
+  useEffect(() => {
+    if (!greetingShownRef.current) {
+      addMessage('bot', "Hello! I'm your Stock Market Guide AI. How can I assist you with stock market-related questions today?");
+      greetingShownRef.current = true;
+    }
+  }, []);
 
-
-  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel(); // Cancel any ongoing speech when component unmounts
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const addMessage = (sender, text) => {
-    setMessages(prevMessages => [...prevMessages, { sender, text }]);
+    setMessages(prevMessages => [...prevMessages, { id: Date.now(), sender, text }]);
   };
 
-  const handleResponse = (input) => {
-    const lowerInput = input.toLowerCase();
-    let responseFound = false;
+  const handleResponse = async (input) => {
+    setIsLoading(true);
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      
+      const prompt = `You are a helpful AI assistant specializing in stock market information. 
+                      Please provide an informative and concise answer to the following question 
+                      about the stock market: "${input}"`;
 
-    // Search for keywords in the predefined keywords array
-    chatbotData.keywords.forEach(keyword => {
-      if (lowerInput.includes(keyword.keyword)) {
-        addMessage('bot', keyword.response);
-        responseFound = true;
-      }
-    });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-    // If no keyword triggers a response, send the default error message
-    if (!responseFound) {
-      addMessage('bot', chatbotData.chatbotData.error.unrecognizedInput);
+      addMessage('bot', text);
+    } catch (error) {
+      console.error('Error fetching response from Gemini:', error);
+      addMessage('bot', "I'm sorry, I encountered an error while processing your request. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,16 +67,29 @@ useEffect(() => {
     if (input.trim() === '') return;
 
     addMessage('user', input);
-    
-    setTimeout(() => {
-      handleResponse(input);
-    }, 500);
-
+    handleResponse(input);
     setInput('');
   };
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
+  };
+
+  const toggleSpeech = (messageId, text) => {
+    if (speakingMessageId === messageId) {
+      // Stop speaking if it's the current message
+      window.speechSynthesis.cancel();
+      setSpeakingMessageId(null);
+    } else {
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      // Start speaking the new message
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.onend = () => setSpeakingMessageId(null);
+      window.speechSynthesis.speak(speech);
+      setSpeakingMessageId(messageId);
+    }
   };
 
   return (
@@ -80,12 +106,23 @@ useEffect(() => {
         </div>
       </div>
       <div className="chat-messages">
-        {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.sender === 'user' ? <User size={16} /> : <Bot size={16} />}
-            <span>{message.text}</span>
+        {messages.map((message) => (
+          <div key={message.id} className={`message ${message.sender}`}>
+            <div className="message-content">
+              {message.sender === 'user' ? <User size={16} /> : <Bot size={16} />}
+              <span>{message.text}</span>
+            </div>
+            {message.sender === 'bot' && (
+              <button 
+                onClick={() => toggleSpeech(message.id, message.text)} 
+                className="speak-btn"
+              >
+                {speakingMessageId === message.id ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+            )}
           </div>
         ))}
+        {isLoading && <div className="loading">Thinking...</div>}
         <div ref={messagesEndRef} />
       </div>
       <form className="form" onSubmit={handleSubmit}>
@@ -93,9 +130,9 @@ useEffect(() => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message here..."
+          placeholder="Ask a stock market question..."
         />
-        <button type="submit"><Send size={18} /></button>
+        <button type="submit" disabled={isLoading}><Send size={18} /></button>
       </form>
     </div>
   );

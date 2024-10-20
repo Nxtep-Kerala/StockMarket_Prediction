@@ -27,7 +27,7 @@ function App() {
 
       {/* Chatbot container with toggle functionality */}
       <div className={`chatbot-container ${isChatbotOpen ? 'open' : ''}`}>
-        {isChatbotOpen && <Chatbot />} {/* Show the chatbot if it is open */}
+        {isChatbotOpen && <Chatbot onClose={() => setIsChatbotOpen(false)} />} 
         <button
           className="chatbot-toggle"
           onClick={toggleChatbot}
