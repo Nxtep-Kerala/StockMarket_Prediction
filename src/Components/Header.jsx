@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext"; // Import the AuthContext
 import { getDatabase, ref, get, set } from "firebase/database";
-import firebase from "firebase/compat/app";
 
 export default function Header() {
   const { logout, auth } = useAuth(); // Get the logout function from the context
@@ -234,10 +233,7 @@ export default function Header() {
               Stock Market Prediction
             </h2>
             <p className="max-w-2xl mx-auto text-gray-400">
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-              Voluptatibus qui aut ducimus vero voluptas autem quia assumenda
-              sed laborum voluptates similique in dicta beatae aliquid quos,
-              vitae facilis labore magnam?
+            The stock market is a dynamic and ever-changing environment, where prices fluctuate based on a variety of factors. Investors and traders have long sought ways to predict market movements to maximize their returns. With the advancement of technology, stock market forecasting has become a key area of interest, utilizing complex algorithms and historical data to anticipate future trends. By analyzing patterns in market behavior, machine learning models can identify signals that may indicate future price movements, helping investors make data-driven decisions. However, despite the potential of these models, predicting stock market prices remains a complex and challenging task, influenced by numerous unpredictable variables such as market sentiment, political events, and economic indicators.
             </p>
             <form
               onSubmit={(e) => e.preventDefault()}

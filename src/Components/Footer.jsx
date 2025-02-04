@@ -3,9 +3,9 @@ export default function Footer() {
         <footer className="pt-10 bg-gray-900">
             <div className="max-w-screen-xl mx-auto px-4 md:px-8">
             <div className="space-y-6 sm:max-w-md sm:mx-auto sm:text-center">
-                    <img src="/logo.png" className="w-32 sm:mx-auto" />
+                    <img src="/logo.png" className="w-32 sm:mx-auto" alt="Brand logo" />
                     <p className="text-white">
-                        Nulla auctor metus vitae lectus iaculis, vel euismod massa efficitur.
+                    Stock market analysis involves studying past data to forecast future price movements, aiding investors in making informed decisions.
                     </p>
                     <div className="items-center gap-x-3 space-y-3 sm:flex sm:justify-center sm:space-y-0">
                         <a href="https://stockanalysisgit-k2ocpbsszxcyaap887ad3z.streamlit.app/" className="block py-2 px-4 text-center text-white font-medium bg-indigo-600 duration-150 hover:bg-indigo-500 active:bg-indigo-700 rounded-lg shadow-lg hover:shadow-none">
@@ -32,7 +32,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="mt-10 py-10 border-t border-gray-700 items-center justify-between sm:flex">
-                    <p className="text-gray-300">© 2024 Sample Inc. All rights reserved.</p>
+                    <p className="text-gray-300">© 2025. All rights reserved.</p>
                     <div className="flex items-center gap-x-6 text-gray-400 mt-6">
                         <a href="javascript:void()">
                             <svg className="w-6 h-6 hover:text-gray-500 duration-150" fill="none" viewBox="0 0 48 48"><g clip-path="url(#a)"><path fill="currentColor" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708v-16.77h-6.094V24h6.094v-5.288c0-6.014 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.978 48 24z" /></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h48v48H0z" /></clipPath></defs></svg>
